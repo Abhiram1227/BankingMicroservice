@@ -1,0 +1,15 @@
+version: '3.7' 
+
+services: 
+  banking-microservice: 
+    image: banking-microservice:1.0 
+    build: . 
+    ports: 
+      - "8000:8080"  # Map port 8080 of the container to port 8080 on the host 
+    networks: 
+      - banking-network 
+    volumes: 
+      - ./target/BankingMicroservice-1.0-SNAPSHOT.jar:/app/app.jar  # Mount the JAR file into the container 
+networks: 
+  banking-network: 
+    driver: bridge 
