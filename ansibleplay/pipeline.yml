@@ -1,6 +1,6 @@
 ---
 - name: Install Docker on CentOS
-  hosts: Ansi-con
+  hosts: clinet
   become: true
   tasks:
     - name: Add Docker repository
