@@ -1,0 +1,37 @@
+--- 
+
+- name: Install Java and Apache on Client 
+
+  hosts: client 
+
+  become: true 
+
+  tasks: 
+
+    - name: Install Java 
+
+      yum: 
+
+        name: java-11-openjdk 
+
+        state: present 
+
+  
+
+    - name: Install Apache 
+
+      yum: 
+
+        name: httpd 
+
+        state: present 
+
+  
+
+    - name: Start Apache service 
+
+      service: 
+
+        name: httpd 
+
+        state: started 
