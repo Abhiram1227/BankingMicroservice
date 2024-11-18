@@ -1,6 +1,6 @@
 ---
 - name: Install Docker on CentOS
-  hosts: clinet
+  hosts: client
   become: true
   tasks:
     - name: Add Docker repository
