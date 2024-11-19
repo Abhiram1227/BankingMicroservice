@@ -5,46 +5,47 @@ provider "azurerm" {
  
 # Resource Group
 resource "azurerm_resource_group" "rg1" {
-  name     = "rg1-NewDeployment"
-  location = "East US"  # Changed to East US for variety
+  name     = "rg1-S2"
+  location = "Canada Central"
 }
  
 # Virtual Network
 resource "azurerm_virtual_network" "vnet" {
-  name                = "vnet-NewDeployment"
-  address_space       = ["10.0.0.0/16"]  # Larger address space for flexibility
+  name                = "vnet-S2"
+  address_space       = ["192.168.0.0/19"]
   location            = azurerm_resource_group.rg1.location
   resource_group_name = azurerm_resource_group.rg1.name
 }
  
 # Subnet
 resource "azurerm_subnet" "subnet" {
-  name                 = "subnet-NewDeployment"
+  name                 = "subnet-S2"
   resource_group_name  = azurerm_resource_group.rg1.name
   virtual_network_name = azurerm_virtual_network.vnet.name
-  address_prefixes     = ["10.0.1.0/24"]  # Adjusted subnet for the new network
+  address_prefixes     = ["192.168.0.0/24"]
 }
  
 # Network Security Group
 resource "azurerm_network_security_group" "nsg" {
-  name                = "nsg-NewDeployment"
+  name                = "nsg-S2"
   location            = azurerm_resource_group.rg1.location
   resource_group_name = azurerm_resource_group.rg1.name
 }
  
 # Public IP Address
 resource "azurerm_public_ip" "vm_public_ip" {
-  name                = "vm-public-ip-NewDeployment"
+  name                = "vm-public-ip"
   location            = azurerm_resource_group.rg1.location
   resource_group_name = azurerm_resource_group.rg1.name
-  allocation_method   = "Static"
-  sku                  = "Standard"  # Using Standard SKU for better scalability
-  domain_name_label   = "newdeployment-public-ip"  # Updated DNS name for the public IP
+  allocation_method   = "Static"  # Changed to Static as required by Standard SKU
+  sku                  = "Standard"  # Specifying the Standard SKU for public IP
+  domain_name_label   = "myvm-public-ip"  # Optional: This will create a DNS name for the public IP
 }
+ 
  
 # Network Interface for Linux VM
 resource "azurerm_network_interface" "nic_linux" {
-  name                = "nic-linux-vm-NewDeployment"
+  name                = "nic-linux-vm"
   location            = azurerm_resource_group.rg1.location
   resource_group_name = azurerm_resource_group.rg1.name
  
@@ -58,31 +59,37 @@ resource "azurerm_network_interface" "nic_linux" {
  
 # Linux Virtual Machine
 resource "azurerm_linux_virtual_machine" "linux_vm" {
-  name                            = "linux-vm-NewDeployment"
+  name                            = "linux-vm"
   resource_group_name             = azurerm_resource_group.rg1.name
   location                        = azurerm_resource_group.rg1.location
-  size                            = "Standard_B2ms"  # Updated to a more cost-effective size for testing/development
+  size                            = "Standard_DS1_v2"
   admin_username                  = "adminuser"
-  admin_password                  = "NewSecurePassword@123"  # Replace with secure credentials
+  admin_password                  = "Password@123" # Replace with secure credentials
   disable_password_authentication = false
-
+ 
   network_interface_ids = [azurerm_network_interface.nic_linux.id]
-
+ 
   os_disk {
     caching              = "ReadWrite"
     storage_account_type = "Standard_LRS"
   }
-
+ 
   source_image_reference {
-    publisher = "Canonical"
-    offer     = "UbuntuServer"
-    sku       = "20.04-LTS"  # Updated to a more commonly used version of Ubuntu
+    publisher = "solvedevops1643693563360"
+    offer     = "rocky-linux-9"
+    sku       = "plan001"
     version   = "latest"
   }
-
+ 
+  plan {
+    name      = "plan001"
+    publisher = "solvedevops1643693563360"
+    product   = "rocky-linux-9"
+  }
+ 
   custom_data = base64encode(file("user-data.sh"))
 }
-
+ 
 # Output Public IP Address
 output "vm_public_ip" {
   value = azurerm_public_ip.vm_public_ip.ip_address
