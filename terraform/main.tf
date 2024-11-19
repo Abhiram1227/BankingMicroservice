@@ -5,29 +5,29 @@ provider "azurerm" {
  
 # Resource Group
 resource "azurerm_resource_group" "rg1" {
-  name     = "rg1-S3"
-  location = "Canada Central"
+  name     = "rg1-NewDeployment"
+  location = "East US"
 }
 
 # Virtual Network
 resource "azurerm_virtual_network" "vnet" {
-  name                = "vnet-S3"
-  address_space       = ["10.0.0.0/16"]
+  name                = "vnet-NewDeployment"
+  address_space       = ["10.1.0.0/16"]
   location            = azurerm_resource_group.rg1.location
   resource_group_name = azurerm_resource_group.rg1.name
 }
 
 # Subnet
 resource "azurerm_subnet" "subnet" {
-  name                 = "subnet-S3"
+  name                 = "subnet-NewDeployment"
   resource_group_name  = azurerm_resource_group.rg1.name
   virtual_network_name = azurerm_virtual_network.vnet.name
-  address_prefixes     = ["10.0.1.0/24"]
+  address_prefixes     = ["10.1.0.0/24"]
 }
 
 # Network Security Group
 resource "azurerm_network_security_group" "nsg" {
-  name                = "nsg-S3"
+  name                = "nsg-NewDeployment"
   location            = azurerm_resource_group.rg1.location
   resource_group_name = azurerm_resource_group.rg1.name
 
@@ -58,17 +58,17 @@ resource "azurerm_network_security_group" "nsg" {
 
 # Public IP Address
 resource "azurerm_public_ip" "vm_public_ip" {
-  name                = "vm-public-ip-S3"
+  name                = "vm-public-ip-NewDeployment"
   location            = azurerm_resource_group.rg1.location
   resource_group_name = azurerm_resource_group.rg1.name
   allocation_method   = "Static"
   sku                  = "Standard"
-  domain_name_label   = "myvm-public-ip-s3"
+  domain_name_label   = "newdeployment-public-ip"
 }
 
 # Network Interface for Linux VM
 resource "azurerm_network_interface" "nic_linux" {
-  name                = "nic-linux-vm-S3"
+  name                = "nic-linux-vm-NewDeployment"
   location            = azurerm_resource_group.rg1.location
   resource_group_name = azurerm_resource_group.rg1.name
 
@@ -82,12 +82,12 @@ resource "azurerm_network_interface" "nic_linux" {
 
 # Linux Virtual Machine
 resource "azurerm_linux_virtual_machine" "linux_vm" {
-  name                            = "linux-vm-S3"
+  name                            = "linux-vm-NewDeployment"
   resource_group_name             = azurerm_resource_group.rg1.name
   location                        = azurerm_resource_group.rg1.location
-  size                            = "Standard_B1ms"
+  size                            = "Standard_B2ms"
   admin_username                  = "adminuser"
-  admin_password                  = "Password@123" # Replace with secure credentials
+  admin_password                  = "SecurePassword@123"  # Replace with secure credentials
   disable_password_authentication = false
   network_interface_ids           = [azurerm_network_interface.nic_linux.id]
 
@@ -99,16 +99,16 @@ resource "azurerm_linux_virtual_machine" "linux_vm" {
   source_image_reference {
     publisher = "Canonical"
     offer     = "UbuntuServer"
-    sku       = "18.04-LTS"
+    sku       = "20.04-LTS"
     version   = "latest"
   }
 
   custom_data = base64encode(file("user-data.sh"))
 }
 
-# Load Balancer (for future scalability)
+# Load Balancer
 resource "azurerm_lb" "lb" {
-  name                            = "lb-S3"
+  name                            = "lb-NewDeployment"
   location                        = azurerm_resource_group.rg1.location
   resource_group_name             = azurerm_resource_group.rg1.name
   sku                             = "Standard"
@@ -116,20 +116,20 @@ resource "azurerm_lb" "lb" {
 
 # Load Balancer Frontend IP Configuration
 resource "azurerm_lb_frontend_ip_configuration" "frontend" {
-  name                                = "frontend-config-S3"
+  name                                = "frontend-config-NewDeployment"
   resource_group_name                 = azurerm_resource_group.rg1.name
   loadbalancer_id                     = azurerm_lb.lb.id
   subnet_id                           = azurerm_subnet.subnet.id
   public_ip_address_id               = azurerm_public_ip.vm_public_ip.id
 }
 
-# Virtual Machine Scale Set (VMSS) - for scalability
+# Virtual Machine Scale Set (VMSS)
 resource "azurerm_virtual_machine_scale_set" "vmss" {
-  name                             = "vmss-S3"
+  name                             = "vmss-NewDeployment"
   location                         = azurerm_resource_group.rg1.location
   resource_group_name              = azurerm_resource_group.rg1.name
-  sku                              = "Standard_D1_v2"
-  instances                        = 2
+  sku                              = "Standard_D2_v3"
+  instances                        = 3
   upgrade_policy {
     mode = "Automatic"
   }
@@ -154,7 +154,7 @@ resource "azurerm_virtual_machine_scale_set" "vmss" {
   os_profile {
     computer_name_prefix = "vmss-instance"
     admin_username       = "adminuser"
-    admin_password       = "Password@123" # Replace with secure credentials
+    admin_password       = "SecurePassword@123"  # Replace with secure credentials
   }
 
   storage_profile {
@@ -166,7 +166,7 @@ resource "azurerm_virtual_machine_scale_set" "vmss" {
     image_reference {
       publisher = "Canonical"
       offer     = "UbuntuServer"
-      sku       = "18.04-LTS"
+      sku       = "20.04-LTS"
       version   = "latest"
     }
   }
