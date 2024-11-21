@@ -44,7 +44,7 @@ resource "azurerm_network_security_group" "nsg" {
     destination_address_prefix = "*"
   }
  security_rule {
-    name                       = "Allow8000"
+    name                       = "ALLOW8000"
     priority                   = 1001
     direction                  = "Inbound"
     access                     = "Allow"
