@@ -127,23 +127,18 @@ resource "azurerm_linux_virtual_machine" "linux_vm" {
 
 # Update the package repository
 # echo "Updating package repository..."
- sudo dnf -y update
+sudo dnf -y update
 
-# Install epel-release (to enable additional repositories for packages like Ansible)
-echo "Installing epel-release..."
-sudo dnf -y install epel-release
- 
-# Install Ansible
-echo "Installing Ansible..."
-sudo dnf -y install ansible
- 
-# Install Git
-echo "Installing Git..."
-sudo dnf -y install git
- 
-# Install JDK 17
-echo "Installing OpenJDK 17..."
-sudo dnf -y install java-17-openjdk-devel
+#script to install java 17
+sudo dnf install java-17-openjdk -y
+
+#script to install git 
+sudo dnf install git -y
+
+#script to install ansible
+sudo dnf install epel-release -y
+sudo dnf install ansible -y
+
 # Add Docker repository
 echo "Adding Docker repository..."
 sudo dnf config-manager --add-repo https://download.docker.com/linux/centos/docker-ce.repo
@@ -174,11 +169,12 @@ sudo mvn --version && echo "Maven successfully installed." || echo "Maven instal
 
 # Script completion message
 echo "Custom data script execution completed."
+
 EOT
   )
 }
 
 # Output Public IP Address
 output "vm_public_ip" {
-  value = azurerm_public_ip.vm_public_ip3.ip_address
+  value = azurerm_public_ip.vm_public_ip.ip_address
 }
