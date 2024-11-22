@@ -2,6 +2,7 @@
 # Update the package repository
 echo "Updating package repository..."
 sudo dnf -y update
+
 # Add Docker repository
 echo "Adding Docker repository..."
 sudo dnf config-manager --add-repo https://download.docker.com/linux/centos/docker-ce.repo
@@ -26,4 +27,4 @@ sudo mvn --version && echo "Maven successfully installed." || echo "Maven instal
 # Script completion message
 echo "Custom data script execution completed."
 
-h
+
