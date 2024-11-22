@@ -7,7 +7,7 @@ terraform {
   backend "azurerm" {
     resource_group_name   = "Rg_terraform"
     storage_account_name  = "terraformcin123"
-    container_name        = "contf"
+    container_name        = "contf1"
     key                   = "terraform.tfstate"  # You can customize the state file name
   }
 }
