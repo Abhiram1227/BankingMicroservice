@@ -5,7 +5,7 @@ services:
     image: banking-microservice:1.0 
     build: . 
     ports: 
-      - "8000:8080"  # Map port 8080 of the container to port 8080 on the host 
+      - "8002:8080"  # Map port 8080 of the container to port 8080 on the host 
     networks: 
       - banking-network 
     volumes: 
